@@ -6,11 +6,106 @@
 body {
     width: 100vw;
     height: 100vh;
+    overflow: hidden;
+}
+
+:root {
+    --pistachio : #88D18A;
 }
 
 /* SECTION: Loading */
-.loading {
+.main#loading-page {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     background-color: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-position: center;
+    background-size: cover;
 }
+
+.main#loading-page::before {
+    content: "";
+    pointer-events: none;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: black;
+    transition: opacity 1s ease;
+}
+
+.main#loading-page.transition::before {
+    opacity: 0;
+}
+
+.loading-page#ring-container {
+    position: relative;
+    height: 80%;
+    aspect-ratio: 1/1;
+    border: 5px solid var(--pistachio);
+    border-radius: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 1.5s cubic-bezier(.55,-0.01,.53,.99);
+    overflow: hidden;
+}
+
+.loading-page#ring-container::before {
+    content: "";
+    pointer-events: none;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: black;
+    transition: background-color 0.75s;
+}
+
+.loading-page#ring-container.transition::before {
+    background-color: transparent;
+}
+
+.loading-page#loading-text {
+    color: var(--pistachio);
+    font-size: 40px;
+    opacity: 1;
+    transition: opacity 0.75s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.loading-page.ring-fallback {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    border: 5px solid var(--pistachio);
+    border-radius: 100%;
+    transition: transform 0.5s cubic-bezier(.15,.58,.38,.96), opacity 0.5s linear;
+}
+
+.loading-page.ring-fallback.no-transition {
+    transition: none;
+}
+/* !SECTION: Loading */
+
+/* SECTION: Media */
+@media (aspect-ratio < 1/1) {
+    /* SECTION: Loading */
+    .loading-page#ring-container {
+        width: 80%;
+        height: auto;
+    }
+    /* !SECTION: Loading */
+}
+/* !SECTION: Media */
