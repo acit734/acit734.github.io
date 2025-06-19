@@ -10,12 +10,14 @@ const global_functions = {
 let loading_page = {
     elements: {
         main: document.querySelector(".main#loading-page"),
-        ring_container: document.querySelector(".loading-page#ring-container"),
+        vignette: document.querySelector(".loading-page#vignette"),
+        hello_text: document.querySelector(".loading-page#hello-text"),
         loading_text: document.querySelector(".loading-page#loading-text"),
         dot_generate: document.querySelector(".loading-page#dot-generate"),
+        ring_fallback: document.querySelectorAll(".loading-page.ring-fallback"),
+        ring_container: document.querySelector(".loading-page#ring-container"),
         ring_fallback1: document.querySelector(".loading-page.ring-fallback#ring-fallback1"),
         ring_fallback2: document.querySelector(".loading-page.ring-fallback#ring-fallback2"),
-        ring_fallback: document.querySelectorAll(".loading-page.ring-fallback"),
     },
 
     variables: {
@@ -37,7 +39,7 @@ let loading_page = {
                 `;
                 document.head.append(style);
             }],
-            ["image/loading-page/profile pic.jpeg", (obj) => {
+            ["image/loading-page/profile pic.png", (obj) => {
                 loading_page.elements.ring_container.style.backgroundImage = `url(${obj})`;
             }],
             ["image/loading-page/landscape background.jpg", (obj) => {
@@ -103,10 +105,11 @@ let loading_page = {
         },
         loading_finished: async () => {
             const wait = global_functions.wait;
-            let loading_intervals = loading_page.variables.loading_intervals;
-            let ring_container = loading_page.elements.ring_container;
-            let loading_text = loading_page.elements.loading_text;
-            let main = loading_page.elements.main;
+            const loading_intervals = loading_page.variables.loading_intervals;
+            const ring_container = loading_page.elements.ring_container;
+            const loading_text = loading_page.elements.loading_text;
+            const vignette = loading_page.elements.vignette;
+            const main = loading_page.elements.main;
 
             loading_intervals.map(interval => {
                 clearInterval(interval);
@@ -121,7 +124,49 @@ let loading_page = {
 
             ring_container.classList.add("transition");
             main.classList.add("transition");
-        }
+
+            await wait(1300);
+
+            ring_container.style.transition = "transform 0.3s ease";
+            ring_container.style.transform = "translateY(-50px) rotateY(360deg) scale(0.4)";
+            vignette.style.opacity = '1';
+            loading_page.functions_general.reveal_hello();
+        },
+        reveal_hello: async  () => {
+            function random_letter() {
+                return String.fromCharCode(Math.floor(Math.random() * (122 - 65 + 1) + 65))
+            }
+            async function randomize_hello_text() {
+                while (!text_done) {
+                [...hello_text.children].map(child => {
+                    if (!child.classList.contains("done")) child.textContent = random_letter();
+                });
+                await wait(30);
+            }
+            }
+
+            const hello_text = loading_page.elements.hello_text;
+            const wait = global_functions.wait;
+            let text_done = false;
+            let index = 0;
+            let interval_id;
+
+            hello_text.style.opacity = "1";
+
+            randomize_hello_text();
+
+            interval_id = setInterval(() => {
+                if (index < hello_text.children.length) {
+                    const child = hello_text.children[index];
+                    child.classList.add("done");
+                    child.textContent = child.id == "exc" ? '!' : child.id;
+                    index++;
+                } else {
+                    clearInterval(interval_id);
+                    text_done = true;
+                }
+            }, 250)
+        },
     },
 
     _init: () => {
@@ -132,6 +177,6 @@ let loading_page = {
         loading_intervals.push(setInterval(loading_page.functions_general.ring_fallback, 4000));
     }
 }
-loading_page._init()
+loading_page._init();
 // console.log(new TextEncoder().encode(JSON.stringify(loading_page)).length)
 });
